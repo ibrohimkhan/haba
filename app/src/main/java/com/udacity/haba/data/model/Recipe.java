@@ -13,4 +13,26 @@ public class Recipe {
         this.image = image;
         this.likes = likes;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Recipe recipe = (Recipe) o;
+
+        if (id != recipe.id) return false;
+        if (likes != recipe.likes) return false;
+        if (!title.equals(recipe.title)) return false;
+        return image != null ? image.equals(recipe.image) : recipe.image == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + title.hashCode();
+        result = 31 * result + (image != null ? image.hashCode() : 0);
+        result = 31 * result + (int) (likes ^ (likes >>> 32));
+        return result;
+    }
 }

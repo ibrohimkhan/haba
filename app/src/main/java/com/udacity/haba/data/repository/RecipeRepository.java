@@ -24,6 +24,9 @@ import io.reactivex.schedulers.Schedulers;
 
 public final class RecipeRepository {
 
+    private static final int MAX_USED_INGREDIENTS = 1;
+    private static final int MIN_MISSED_INGREDIENTS = 2;
+
     private static NetworkService service = Networking.createService(NetworkService.class);
 
     private RecipeRepository() {}
@@ -38,7 +41,7 @@ public final class RecipeRepository {
     }
 
     public static Single<List<Recipe>> fetchRecipesByIngredients(List<String> ingredients, int number) {
-        return service.loadRecipesByIngredients(ingredients, number, BuildConfig.API_KEY)
+        return service.loadRecipesByIngredients(ingredients, number, MIN_MISSED_INGREDIENTS, BuildConfig.API_KEY)
                 .subscribeOn(Schedulers.io())
                 .map(items -> {
                     List<Recipe> recipes = new ArrayList<>();
@@ -132,7 +135,8 @@ public final class RecipeRepository {
                 response.servings,
                 extendedIngredients,
                 response.instructions,
-                instructions
+                instructions,
+                response.aggregateLikes
         );
     }
 }

@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.udacity.haba.R;
 import com.udacity.haba.databinding.ActivityMainBinding;
+import com.udacity.haba.ui.recipes.RecipeFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,6 +51,50 @@ public class MainActivity extends AppCompatActivity {
         outState.putString(ACTIVE_FRAGMENT, activeFragment.getTag());
     }
 
+    private void setupBottomNavigationBar() {
+        binding.bottomNavigation.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.recipes:
+                    showRecipesFragment();
+                    return true;
+
+                case R.id.ingredients:
+                    showIngredientsFragment();
+                    return true;
+
+                case R.id.favorites:
+                    showFavoriteRecipeFragment();
+                    return true;
+            }
+
+            return false;
+        });
+
+        binding.bottomNavigation.setSelectedItemId(R.id.ingredients);
+    }
+
+    private void showRecipesFragment() {
+        if (activeFragment instanceof RecipeFragment) return;
+
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(RecipeFragment.TAG);
+
+        if (fragment == null) {
+            fragment = RecipeFragment.newInstance();
+            addNewFragment(fragment, RecipeFragment.TAG);
+
+        } else {
+            showFragment(fragment);
+        }
+    }
+
+    private void showIngredientsFragment() {
+        Toast.makeText(this, "Ingredients selected", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showFavoriteRecipeFragment() {
+        Toast.makeText(this, "Favorites selected", Toast.LENGTH_SHORT).show();
+    }
+
     private void addNewFragment(Fragment fragment, String tag) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -72,27 +117,5 @@ public class MainActivity extends AppCompatActivity {
         transaction.commitNow();
 
         activeFragment = fragment;
-    }
-
-    private void setupBottomNavigationBar() {
-        binding.bottomNavigation.setOnNavigationItemSelectedListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.recipes:
-                    Toast.makeText(this, "Recipes selected", Toast.LENGTH_SHORT).show();
-                    return true;
-
-                case R.id.ingredients:
-                    Toast.makeText(this, "Ingredients selected", Toast.LENGTH_SHORT).show();
-                    return true;
-
-                case R.id.favorites:
-                    Toast.makeText(this, "Favorites selected", Toast.LENGTH_SHORT).show();
-                    return true;
-            }
-
-            return false;
-        });
-
-        binding.bottomNavigation.setSelectedItemId(R.id.ingredients);
     }
 }

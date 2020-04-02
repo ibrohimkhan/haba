@@ -43,7 +43,11 @@ public class RecipeDetailsResponse {
     @SerializedName("analyzedInstructions")
     public final List<InstructionsResponse> analyzedInstructions;
 
-    public RecipeDetailsResponse(long id, String title, String image, String imageType, int readyInMinutes, int servings, List<ExtendedIngredientsResponse> extendedIngredients, String instructions, List<InstructionsResponse> analyzedInstructions) {
+    @Expose
+    @SerializedName("aggregateLikes")
+    public final int aggregateLikes;
+
+    public RecipeDetailsResponse(long id, String title, String image, String imageType, int readyInMinutes, int servings, List<ExtendedIngredientsResponse> extendedIngredients, String instructions, List<InstructionsResponse> analyzedInstructions, int aggregateLikes) {
         this.id = id;
         this.title = title;
         this.image = image;
@@ -53,5 +57,6 @@ public class RecipeDetailsResponse {
         this.extendedIngredients = extendedIngredients;
         this.instructions = instructions;
         this.analyzedInstructions = analyzedInstructions;
+        this.aggregateLikes = aggregateLikes;
     }
 }

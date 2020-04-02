@@ -3,4 +3,8 @@
     <string name="products">Products</string>
     <string name="recipes">Recipes</string>
     <string name="favorites">Favorites</string>
+    <string name="attention">Attention</string>
+    <string name="ok">OK</string>
+    <string name="somthing_went_wrong">Sorry, something went wrong!</string>
+    <string name="network_connection_error">There is no Internet connection</string>
 </resources>

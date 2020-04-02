@@ -23,6 +23,7 @@ public interface NetworkService {
     Single<List<RecipeResponse>> loadRecipesByIngredients(
         @Query("ingredients") List<String> ingredients,
         @Query("number") int number,
+        @Query("ranking") int ranking,
         @Query("apiKey") String apiKey
     );
 

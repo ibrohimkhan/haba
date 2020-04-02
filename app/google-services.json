@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1002817175603",
+    "firebase_url": "https://haba-2217b.firebaseio.com",
+    "project_id": "haba-2217b",
+    "storage_bucket": "haba-2217b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002817175603:android:47969a9c7dfab41901e346",
+        "android_client_info": {
+          "package_name": "com.udacity.haba"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1002817175603-vmgscl11ohbia4vkv5q5t01d8qus273p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNWkFr_j8jWefVv4o1F0nLqOmJPN7Uz6c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1002817175603-vmgscl11ohbia4vkv5q5t01d8qus273p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
