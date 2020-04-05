@@ -9,6 +9,7 @@ import java.util.List;
 
 import io.reactivex.Single;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface NetworkService {
@@ -29,7 +30,7 @@ public interface NetworkService {
 
     @GET(BuildConfig.BASE_URL + Endpoints.RECIPE_INFORMATION)
     Single<RecipeDetailsResponse> loadRecipeDetails(
-            @Query("recipe_id") long id,
+            @Path("recipe_id") long id,
             @Query("apiKey") String apiKey
     );
 }

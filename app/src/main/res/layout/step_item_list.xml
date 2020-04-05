@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        style="@style/TextAppearance.AppCompat.Body2"
+        android:id="@+id/tv_step_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/light_black"
+        android:fontFamily="@font/stoke"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        style="@style/TextAppearance.AppCompat.Body2"
+        android:id="@+id/tv_step_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/grey"
+        android:fontFamily="@font/stoke"
+        android:breakStrategy="high_quality"
+        android:justificationMode="inter_word"/>
+
+    <TextView
+        style="@style/TextAppearance.AppCompat.Body2"
+        android:id="@+id/tv_ingredient_step"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/light_black"
+        android:text="@string/ingredients"
+        android:fontFamily="@font/stoke"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:visibility="gone"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_step_ingredient"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:nestedScrollingEnabled="false"/>
+
+    <TextView
+        style="@style/TextAppearance.AppCompat.Body2"
+        android:id="@+id/tv_equipment_step"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/light_black"
+        android:text="@string/equipments"
+        android:fontFamily="@font/stoke"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:visibility="gone"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_step_equipment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:nestedScrollingEnabled="false"/>
+
+</LinearLayout>

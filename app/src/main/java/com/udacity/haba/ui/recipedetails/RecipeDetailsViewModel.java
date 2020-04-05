@@ -1,4 +1,4 @@
-package com.udacity.haba.ui.recipes;
+package com.udacity.haba.ui.recipedetails;
 
 import android.util.Log;
 
@@ -6,33 +6,33 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.udacity.haba.data.model.RandomRecipe;
-import com.udacity.haba.data.model.Recipe;
+import com.udacity.haba.data.model.RecipeDetails;
 import com.udacity.haba.data.repository.RecipeRepository;
+import com.udacity.haba.ui.recipes.RecipeViewModel;
 import com.udacity.haba.utils.Event;
 
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
 
-public class RecipeViewModel extends ViewModel {
+public class RecipeDetailsViewModel extends ViewModel {
 
     private static final String TAG         = RecipeViewModel.class.getSimpleName();
-    private static final int MAX_RECIPES    = 25;
 
     private CompositeDisposable disposable  = new CompositeDisposable();
+    private static Map<Long, RecipeDetails> cache  = new HashMap<>();
 
     MutableLiveData<Event<Boolean>> loading             = new MutableLiveData<>();
     MutableLiveData<Event<Boolean>> error               = new MutableLiveData<>();
     MutableLiveData<Event<Boolean>> connectionError     = new MutableLiveData<>();
     MutableLiveData<Event<String>> errorMessage         = new MutableLiveData<>();
-    MutableLiveData<Event<RandomRecipe>> randomRecipes  = new MutableLiveData<>();
-    MutableLiveData<List<Recipe>> recipes               = new MutableLiveData<>();
-    MutableLiveData<Event<Integer>> onRecipeSelected    = new MutableLiveData<>();
+    MutableLiveData<RecipeDetails> recipeDetails        = new MutableLiveData<>();
+
+    private long currentId;
 
     @Override
     protected void onCleared() {
@@ -40,32 +40,27 @@ public class RecipeViewModel extends ViewModel {
         super.onCleared();
     }
 
-    public RecipeViewModel() {
-        loadRecipes();
+    public void initialize(long id) {
+        if (!cache.containsKey(id)) {
+            currentId = id;
+            loadRecipeDetails(id);
+
+        } else {
+            recipeDetails.setValue(cache.get(id));
+        }
     }
 
-    public List<Long> getRecipeIds(List<? extends Recipe> recipes) {
-        List<Long> ids = new ArrayList<>();
-        for (Recipe recipe : recipes) ids.add(recipe.id);
+    private void loadRecipeDetails(long id) {
+        loading.setValue(new Event<>(true));
 
-        return ids;
-    }
-
-    public void reload() {
-        if (loading.getValue().peek()) return;
-        loadRecipes();
-    }
-
-    private void loadRecipes() {
-        loading.postValue(new Event<>(true));
         disposable.add(
-                RecipeRepository.fetchRandomRecipes(MAX_RECIPES)
+                RecipeRepository.fetchRecipeDetails(id)
                         .subscribeOn(Schedulers.io())
-                        .subscribe(this::notifyUI, this::handleNetworkError)
+                        .subscribe(this::notifyUI, this::handleError)
         );
     }
 
-    private void handleNetworkError(Throwable throwable) {
+    private void handleError(Throwable throwable) {
         loading.postValue(new Event<>(false));
 
         if (throwable instanceof HttpException) {
@@ -73,15 +68,12 @@ public class RecipeViewModel extends ViewModel {
             String message = null;
 
             try {
-                message =
-                        exception
-                                .response()
-                                .errorBody()
-                                .string()
-                                .split(",")[2]
-                                .split(":")[1]
-                                .replace("}", "")
-                                .replaceAll("\"", "");
+                message = exception.response().errorBody().string();
+
+                int start = message.indexOf("We");
+                int end = message.indexOf(" If this");
+
+                message = message.substring(start, end);
 
             } catch (Exception e) {
                 Log.d(TAG, e.toString());
@@ -112,8 +104,10 @@ public class RecipeViewModel extends ViewModel {
         }
     }
 
-    private void notifyUI(RandomRecipe recipes) {
+    private void notifyUI(RecipeDetails recipeDetails) {
+        cache.put(currentId, recipeDetails);
+
         loading.postValue(new Event<>(false));
-        randomRecipes.postValue(new Event<>(recipes));
+        this.recipeDetails.postValue(recipeDetails);
     }
 }

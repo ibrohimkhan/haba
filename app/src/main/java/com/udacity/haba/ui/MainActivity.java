@@ -9,10 +9,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.udacity.haba.R;
+import com.udacity.haba.data.model.Recipe;
 import com.udacity.haba.databinding.ActivityMainBinding;
+import com.udacity.haba.ui.eventlistener.RecipeSelectionEventListener;
+import com.udacity.haba.ui.recipedetails.RecipeDetailsViewPagerFragment;
 import com.udacity.haba.ui.recipes.RecipeFragment;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements RecipeSelectionEventListener {
 
     private ActivityMainBinding binding;
 
@@ -51,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
         outState.putString(ACTIVE_FRAGMENT, activeFragment.getTag());
     }
 
+    @Override
+    public void onRecipeSelectedEvent(int position, List<Long> recipeIds) {
+        showRecipeDetailsFragment(position, recipeIds);
+    }
+
     private void setupBottomNavigationBar() {
         binding.bottomNavigation.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
@@ -81,6 +91,20 @@ public class MainActivity extends AppCompatActivity {
         if (fragment == null) {
             fragment = RecipeFragment.newInstance();
             addNewFragment(fragment, RecipeFragment.TAG);
+
+        } else {
+            showFragment(fragment);
+        }
+    }
+
+    private void showRecipeDetailsFragment(int position, List<Long> recipeIds) {
+        if (activeFragment instanceof RecipeDetailsViewPagerFragment) return;
+
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(RecipeDetailsViewPagerFragment.TAG);
+
+        if (fragment == null) {
+            fragment = RecipeDetailsViewPagerFragment.newInstance(position, recipeIds);
+            addNewFragment(fragment, RecipeDetailsViewPagerFragment.TAG);
 
         } else {
             showFragment(fragment);

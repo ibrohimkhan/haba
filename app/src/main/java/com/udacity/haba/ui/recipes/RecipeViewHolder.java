@@ -15,17 +15,18 @@ public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.On
     private RecipeItemListBinding binding;
 
     private RecipeViewModel viewModel;
-    private Recipe recipe;
+    private int position;
 
     public RecipeViewHolder(@NonNull View itemView, RecipeViewModel viewModel) {
         super(itemView);
         this.viewModel = viewModel;
 
+        itemView.setOnClickListener(this);
         binding = RecipeItemListBinding.bind(itemView);
     }
 
-    public void bind(Recipe recipe) {
-        this.recipe = recipe;
+    public void bind(Recipe recipe, int position) {
+        this.position = position;
 
         Picasso.get()
                 .load(recipe.image)
@@ -37,6 +38,6 @@ public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.On
 
     @Override
     public void onClick(View v) {
-        viewModel.onRecipeSelected.setValue(new Event<>(recipe.id));
+        viewModel.onRecipeSelected.setValue(new Event<>(position));
     }
 }

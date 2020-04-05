@@ -13,8 +13,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.udacity.haba.R;
+import com.udacity.haba.data.model.Recipe;
 import com.udacity.haba.databinding.FragmentRecipeBinding;
+import com.udacity.haba.ui.eventlistener.RecipeSelectionEventListener;
 import com.udacity.haba.utils.DialogUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RecipeFragment extends Fragment {
 
@@ -26,8 +31,11 @@ public class RecipeFragment extends Fragment {
     private RecipeAdapter adapter;
     private LinearLayoutManager linearLayoutManager;
 
+    private List<? extends Recipe> recipes;
     private boolean scrolling;
     private int rvPosition;
+
+    private RecipeSelectionEventListener listener;
 
     public static RecipeFragment newInstance() {
         Bundle args = new Bundle();
@@ -41,8 +49,10 @@ public class RecipeFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getActivity() != null)
+        if (getActivity() != null) {
             viewModel = new ViewModelProvider(this).get(RecipeViewModel.class);
+            listener = (RecipeSelectionEventListener) getActivity();
+        }
     }
 
     @Override
@@ -125,6 +135,7 @@ public class RecipeFragment extends Fragment {
 
         viewModel.randomRecipes.observe(getViewLifecycleOwner(), event -> {
             if (event.getIfNotHandled() == null) return;
+            recipes = new ArrayList<>(event.peek().recipes);
 
             if (adapter == null) {
                 adapter = new RecipeAdapter(event.peek().recipes, viewModel);
@@ -142,7 +153,7 @@ public class RecipeFragment extends Fragment {
 
         viewModel.onRecipeSelected.observe(getViewLifecycleOwner(), event -> {
             if (event.getIfNotHandled() == null) return;
-            // TODO: pass this id to RecipeDetails fragment
+            listener.onRecipeSelectedEvent(event.peek().intValue(), viewModel.getRecipeIds(recipes));
         });
     }
 }
