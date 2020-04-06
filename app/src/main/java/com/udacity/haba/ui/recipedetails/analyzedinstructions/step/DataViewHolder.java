@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
-import com.udacity.haba.BuildConfig;
 import com.udacity.haba.data.model.Data;
 import com.udacity.haba.databinding.DataItemListBinding;
 
@@ -20,17 +19,10 @@ public class DataViewHolder extends RecyclerView.ViewHolder {
         binding = DataItemListBinding.bind(itemView);
     }
 
-    public void bind(Data data, boolean isIngredient) {
+    public void bind(Data data, String baseUrl) {
         if (!TextUtils.isEmpty(data.image)) {
-
-            String url = null;
-            if (isIngredient)
-                url = BuildConfig.INGREDIENTS_IMAGE_URL + data.image;
-            else
-                url = BuildConfig.EQUIPMENT_IMAGE_URL + data.image;
-
             Picasso.get()
-                    .load(url)
+                    .load(baseUrl + data.image)
                     .into(binding.ivItemImage);
         }
 

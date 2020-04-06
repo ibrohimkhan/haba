@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.udacity.haba.BuildConfig;
 import com.udacity.haba.data.model.Step;
 import com.udacity.haba.databinding.StepItemListBinding;
 
@@ -27,13 +28,13 @@ public class StepViewHolder extends RecyclerView.ViewHolder {
 
         if (step.equipment != null && !step.equipment.isEmpty()) {
             binding.tvEquipmentStep.setVisibility(View.VISIBLE);
-            DataAdapter adapter = new DataAdapter(step.equipment, false);
+            DataAdapter adapter = new DataAdapter(step.equipment, BuildConfig.EQUIPMENT_IMAGE_URL);
             binding.rvStepEquipment.setAdapter(adapter);
         }
 
         if (step.ingredients != null && !step.ingredients.isEmpty()) {
             binding.tvIngredientStep.setVisibility(View.VISIBLE);
-            DataAdapter adapter = new DataAdapter(step.ingredients, true);
+            DataAdapter adapter = new DataAdapter(step.ingredients, BuildConfig.INGREDIENTS_IMAGE_URL);
             binding.rvStepIngredient.setAdapter(adapter);
         }
     }

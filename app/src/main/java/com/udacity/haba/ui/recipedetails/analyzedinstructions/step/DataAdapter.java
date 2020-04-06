@@ -15,11 +15,11 @@ import java.util.List;
 public class DataAdapter extends RecyclerView.Adapter<DataViewHolder> {
 
     private List<Data> data;
-    private boolean isIngredient;
+    private String baseUrl;
 
-    public DataAdapter(List<Data> data, boolean isIngredient) {
+    public DataAdapter(List<Data> data, String baseUrl) {
         this.data = data;
-        this.isIngredient = isIngredient;
+        this.baseUrl = baseUrl;
     }
 
     @NonNull
@@ -31,7 +31,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull DataViewHolder holder, int position) {
-        holder.bind(data.get(position), isIngredient);
+        holder.bind(data.get(position), baseUrl);
     }
 
     @Override
