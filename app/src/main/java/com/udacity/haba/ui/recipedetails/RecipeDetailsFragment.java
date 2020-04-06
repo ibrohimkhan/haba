@@ -2,6 +2,7 @@ package com.udacity.haba.ui.recipedetails;
 
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -31,6 +33,7 @@ public class RecipeDetailsFragment extends Fragment {
     private RecipeDetailsViewModel viewModel;
 
     private FragmentRecipeDetailsBinding binding;
+    private boolean liked;
 
     public static RecipeDetailsFragment newInstance(long id) {
         Bundle args = new Bundle();
@@ -70,7 +73,6 @@ public class RecipeDetailsFragment extends Fragment {
 
         binding.ctlCollapsingToolbarLayout.setCollapsedTitleTextColor(Color.WHITE);
         binding.rvExtendedIngredients.setLayoutManager(new LinearLayoutManager(requireContext()));
-        binding.rvExtendedIngredients.setNestedScrollingEnabled(false);
 
         viewModel.loading.observe(getViewLifecycleOwner(), event -> {
             if (event.getIfNotHandled() == null) return;
@@ -135,6 +137,32 @@ public class RecipeDetailsFragment extends Fragment {
                 AnalyzedInstructionsAdapter adapter = new AnalyzedInstructionsAdapter(recipeDetails.analyzedInstructions);
                 binding.rvAnalyzedInstructions.setAdapter(adapter);
             }
+
+            if (recipeDetails.isLiked) likeRecipe();
+            else dislikeRecipe();
+
+            binding.tvSave.setOnClickListener( item -> {
+                liked = !liked;
+                recipeDetails.isLiked = liked;
+
+                if (liked) likeRecipe();
+                else dislikeRecipe();
+
+                viewModel.save(recipeDetails);
+            });
+
         });
+    }
+
+    private void likeRecipe() {
+        Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_saved);
+        binding.tvSave.setCompoundDrawablesWithIntrinsicBounds(null, drawable, null, null);
+        binding.tvSave.setText(getString(R.string.dislike));
+    }
+
+    private void dislikeRecipe() {
+        Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_unsaved);
+        binding.tvSave.setCompoundDrawablesWithIntrinsicBounds(null, drawable, null, null);
+        binding.tvSave.setText(getString(R.string.like));
     }
 }

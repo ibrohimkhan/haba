@@ -8,7 +8,8 @@
     <string name="ok">OK</string>
     <string name="somthing_went_wrong">Sorry, something went wrong!</string>
     <string name="network_connection_error">There is no Internet connection</string>
-    <string name="save">Save</string>
+    <string name="like">Like</string>
+    <string name="dislike">Dislike</string>
     <string name="ingredients">Ingredients</string>
     <string name="instruction">Instruction</string>
     <string name="steps">Analyzed Instruction</string>

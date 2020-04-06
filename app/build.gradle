@@ -28,6 +28,8 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField("String", "BASE_URL", "\"https://api.spoonacular.com/\"")
+            buildConfigField("String", "INGREDIENTS_IMAGE_URL", "\"https://spoonacular.com/cdn/ingredients_100x100/\"")
+            buildConfigField("String", "EQUIPMENT_IMAGE_URL", "\"https://spoonacular.com/cdn/equipment_100x100/\"")
             buildConfigField("String", "API_KEY", "\"YOUR_API_KEY\"")
         }
     }

@@ -14,6 +14,7 @@ public class RecipeDetails extends Recipe {
     public final String instructions;
     public final List<Instructions> analyzedInstructions;
     public final int aggregateLikes;
+    public boolean isLiked;
 
     public RecipeDetails(long id, String title, String image, String imageType, int readyInMinutes, int servings, List<Data> extendedIngredients, String instructions, List<Instructions> analyzedInstructions, int aggregateLikes) {
         super(id, title, image, aggregateLikes);

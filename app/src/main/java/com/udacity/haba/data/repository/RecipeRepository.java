@@ -64,6 +64,10 @@ public final class RecipeRepository {
                 .map(RecipeRepository::toRecipeDetails);
     }
 
+    public static void save(RecipeDetails recipeDetails) {
+        // TODO: SAVE RECIPE INTO DB
+    }
+
     private static List<RecipeDetails> toRecipeDetailsList(List<RecipeDetailsResponse> responses) {
         List<RecipeDetails> recipeDetails = new ArrayList<>();
         for (RecipeDetailsResponse response : responses) {

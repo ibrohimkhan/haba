@@ -50,6 +50,10 @@ public class RecipeDetailsViewModel extends ViewModel {
         }
     }
 
+    public void save(RecipeDetails recipeDetails) {
+        RecipeRepository.save(recipeDetails);
+    }
+
     private void loadRecipeDetails(long id) {
         loading.setValue(new Event<>(true));
 
