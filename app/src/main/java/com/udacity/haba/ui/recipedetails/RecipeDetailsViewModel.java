@@ -61,6 +61,8 @@ public class RecipeDetailsViewModel extends ViewModel {
                                 },
                                 throwable -> {
                                     Log.d(TAG, throwable.toString());
+                                    FirebaseCrashlytics.getInstance().recordException(throwable);
+                                    FirebaseCrashlytics.getInstance().setCustomKey(TAG, throwable.toString());
                                 }
                         )
         );
@@ -75,6 +77,8 @@ public class RecipeDetailsViewModel extends ViewModel {
                                 },
                                 throwable -> {
                                     Log.d(TAG, throwable.toString());
+                                    FirebaseCrashlytics.getInstance().recordException(throwable);
+                                    FirebaseCrashlytics.getInstance().setCustomKey(TAG, throwable.toString());
                                 }
                         )
         );
