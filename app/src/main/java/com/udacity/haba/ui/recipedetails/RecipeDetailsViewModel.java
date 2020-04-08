@@ -32,6 +32,8 @@ public class RecipeDetailsViewModel extends ViewModel {
     MutableLiveData<Event<String>> errorMessage         = new MutableLiveData<>();
     MutableLiveData<RecipeDetails> recipeDetails        = new MutableLiveData<>();
 
+    MutableLiveData<Event<Boolean>> completed           = new MutableLiveData<>();
+
     private long currentId;
 
     @Override
@@ -51,7 +53,31 @@ public class RecipeDetailsViewModel extends ViewModel {
     }
 
     public void save(RecipeDetails recipeDetails) {
-        RecipeRepository.save(recipeDetails);
+        disposable.add(
+                RecipeRepository.save(recipeDetails)
+                        .subscribe(
+                                () -> {
+                                    completed.postValue(new Event<>(true));
+                                },
+                                throwable -> {
+                                    Log.d(TAG, throwable.toString());
+                                }
+                        )
+        );
+    }
+
+    public void remove(RecipeDetails recipeDetails) {
+        disposable.add(
+                RecipeRepository.delete(recipeDetails)
+                        .subscribe(
+                                () -> {
+                                    completed.postValue(new Event<>(true));
+                                },
+                                throwable -> {
+                                    Log.d(TAG, throwable.toString());
+                                }
+                        )
+        );
     }
 
     private void loadRecipeDetails(long id) {
@@ -72,7 +98,20 @@ public class RecipeDetailsViewModel extends ViewModel {
             String message = null;
 
             try {
-                message = exception.response().errorBody().string();
+                if (exception.code() != 401) {
+                    message = exception.response().errorBody().string();
+
+                } else {
+                    message =
+                            exception
+                                    .response()
+                                    .errorBody()
+                                    .string()
+                                    .split(",")[2]
+                                    .split(":")[1]
+                                    .replace("}", "")
+                                    .replaceAll("\"", "");
+                }
 
                 int start = message.indexOf("We");
                 int end = message.indexOf(" If this");

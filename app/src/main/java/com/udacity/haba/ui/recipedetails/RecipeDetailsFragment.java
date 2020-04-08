@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -142,15 +143,25 @@ public class RecipeDetailsFragment extends Fragment {
             else dislikeRecipe();
 
             binding.tvSave.setOnClickListener( item -> {
+                if (!binding.tvSave.isEnabled()) return;
+
                 liked = !liked;
                 recipeDetails.isLiked = liked;
 
                 if (liked) likeRecipe();
                 else dislikeRecipe();
 
-                viewModel.save(recipeDetails);
+                binding.tvSave.setEnabled(false);
+                if (liked) viewModel.save(recipeDetails);
+                else viewModel.remove(recipeDetails);
             });
+        });
 
+        viewModel.completed.observe(getViewLifecycleOwner(), event -> {
+            if (!binding.tvSave.isEnabled()) {
+                binding.tvSave.setEnabled(true);
+                Toast.makeText(requireContext(), getString(R.string.action_completed), Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

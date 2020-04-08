@@ -1,6 +1,11 @@
 package com.udacity.haba.data.repository;
 
 import com.udacity.haba.BuildConfig;
+import com.udacity.haba.data.local.AppDatabase;
+import com.udacity.haba.data.local.entity.DataEntity;
+import com.udacity.haba.data.local.entity.InstructionsEntity;
+import com.udacity.haba.data.local.entity.RecipeDetailsEntity;
+import com.udacity.haba.data.local.entity.StepEntity;
 import com.udacity.haba.data.model.Data;
 import com.udacity.haba.data.model.Instructions;
 import com.udacity.haba.data.model.RandomRecipe;
@@ -19,6 +24,7 @@ import com.udacity.haba.data.remote.response.StepResponse;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 
@@ -28,8 +34,10 @@ public final class RecipeRepository {
     private static final int MIN_MISSED_INGREDIENTS = 2;
 
     private static NetworkService service = Networking.createService(NetworkService.class);
+    private static final AppDatabase database = AppDatabase.getInstance();
 
-    private RecipeRepository() {}
+    private RecipeRepository() {
+    }
 
     public static Single<RandomRecipe> fetchRandomRecipes(int number) {
         return service.loadRandomRecipes(number, BuildConfig.API_KEY)
@@ -64,8 +72,23 @@ public final class RecipeRepository {
                 .map(RecipeRepository::toRecipeDetails);
     }
 
-    public static void save(RecipeDetails recipeDetails) {
-        // TODO: SAVE RECIPE INTO DB
+    public static Completable save(RecipeDetails recipeDetails) {
+        return database.recipeDetailsDao()
+                .insert(toRecipeDetailsEntity(recipeDetails))
+                .subscribeOn(Schedulers.io());
+    }
+
+    public static Completable delete(RecipeDetails recipeDetails) {
+        return database.recipeDetailsDao()
+                .delete(toRecipeDetailsEntity(recipeDetails))
+                .subscribeOn(Schedulers.io());
+    }
+
+    public static Single<List<RecipeDetails>> selectAll() {
+        return database.recipeDetailsDao()
+                .select()
+                .subscribeOn(Schedulers.io())
+                .map(RecipeRepository::entityToRecipeDetailsList);
     }
 
     private static List<RecipeDetails> toRecipeDetailsList(List<RecipeDetailsResponse> responses) {
@@ -142,5 +165,134 @@ public final class RecipeRepository {
                 instructions,
                 response.aggregateLikes
         );
+    }
+
+    private static List<RecipeDetails> entityToRecipeDetailsList(List<RecipeDetailsEntity> entities) {
+        List<RecipeDetails> recipeDetails = new ArrayList<>();
+        for (RecipeDetailsEntity entity : entities) {
+            recipeDetails.add(toRecipeDetails(entity));
+        }
+
+        return recipeDetails;
+    }
+
+    private static RecipeDetails toRecipeDetails(RecipeDetailsEntity entity) {
+        List<Data> extendedIngredients = new ArrayList<>();
+        for (DataEntity data : entity.extendedIngredients) {
+            extendedIngredients.add(new Data(
+                    data.id,
+                    data.name,
+                    data.image
+            ));
+        }
+
+        List<Instructions> instructions = new ArrayList<>();
+        for (InstructionsEntity instructionsEntity : entity.analyzedInstructions) {
+
+            List<Step> steps = new ArrayList<>();
+            for (StepEntity stepEntity : instructionsEntity.steps) {
+
+                List<Data> ingredients = new ArrayList<>();
+                for (DataEntity dataEntity : stepEntity.ingredients) {
+                    ingredients.add(new Data(
+                            dataEntity.id,
+                            dataEntity.name,
+                            dataEntity.image
+                    ));
+                }
+
+                List<Data> equipment = new ArrayList<>();
+                for (DataEntity dataEntity : stepEntity.equipment) {
+                    equipment.add(new Data(
+                            dataEntity.id,
+                            dataEntity.name,
+                            dataEntity.image
+                    ));
+                }
+
+                steps.add(new Step(
+                        stepEntity.number,
+                        stepEntity.step,
+                        ingredients,
+                        equipment
+                ));
+            }
+
+            Instructions instruction = new Instructions(
+                    instructionsEntity.name,
+                    steps
+            );
+
+            instructions.add(instruction);
+        }
+
+        return new RecipeDetails(
+                entity.id,
+                entity.title,
+                entity.image,
+                entity.imageType,
+                entity.readyInMinutes,
+                entity.servings,
+                extendedIngredients,
+                entity.instructions,
+                instructions,
+                entity.aggregateLikes,
+                entity.isLiked
+        );
+    }
+
+    private static RecipeDetailsEntity toRecipeDetailsEntity(RecipeDetails recipeDetails) {
+        return new RecipeDetailsEntity(
+                recipeDetails.id,
+                recipeDetails.title,
+                recipeDetails.image,
+                recipeDetails.imageType,
+                recipeDetails.readyInMinutes,
+                recipeDetails.servings,
+                toDataEntity(recipeDetails.extendedIngredients),
+                recipeDetails.instructions,
+                toInstructionsEntity(recipeDetails.analyzedInstructions),
+                recipeDetails.aggregateLikes,
+                recipeDetails.isLiked
+        );
+    }
+
+    private static List<DataEntity> toDataEntity(List<Data> data) {
+        List<DataEntity> entitie = new ArrayList<>();
+        for (Data item : data) {
+            entitie.add(new DataEntity(
+                    item.id,
+                    item.name,
+                    item.image
+            ));
+        }
+
+        return entitie;
+    }
+
+    private static List<InstructionsEntity> toInstructionsEntity(List<Instructions> items) {
+        List<InstructionsEntity> entities = new ArrayList<>();
+        for (Instructions item : items) {
+            entities.add(new InstructionsEntity(
+                    item.name,
+                    toStepEntity(item.steps)
+            ));
+        }
+
+        return entities;
+    }
+
+    private static List<StepEntity> toStepEntity(List<Step> items) {
+        List<StepEntity> entities = new ArrayList<>();
+        for (Step item : items) {
+            entities.add(new StepEntity(
+                    item.number,
+                    item.step,
+                    toDataEntity(item.ingredients),
+                    toDataEntity(item.equipment)
+            ));
+        }
+
+        return entities;
     }
 }
