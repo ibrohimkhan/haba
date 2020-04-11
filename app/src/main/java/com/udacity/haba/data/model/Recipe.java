@@ -1,6 +1,10 @@
 package com.udacity.haba.data.model;
 
-public class Recipe {
+import java.io.Serializable;
+
+public class Recipe implements Serializable {
+
+    private static final long serialversionUID = 41L;
 
     public final long id;
     public final String title;

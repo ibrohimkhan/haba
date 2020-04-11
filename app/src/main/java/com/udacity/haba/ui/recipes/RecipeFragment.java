@@ -13,13 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.udacity.haba.R;
-import com.udacity.haba.data.model.Recipe;
 import com.udacity.haba.databinding.FragmentRecipeBinding;
 import com.udacity.haba.ui.eventlistener.RecipeSelectionEventListener;
 import com.udacity.haba.utils.DialogUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RecipeFragment extends Fragment {
 
@@ -28,10 +24,9 @@ public class RecipeFragment extends Fragment {
 
     private FragmentRecipeBinding binding;
     private RecipeViewModel viewModel;
-    private RecipeAdapter adapter;
+    private RandomRecipeAdapter randomRecipeAdapter;
     private LinearLayoutManager linearLayoutManager;
 
-    private List<? extends Recipe> recipes;
     private boolean scrolling;
     private int rvPosition;
 
@@ -72,6 +67,9 @@ public class RecipeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         linearLayoutManager = new LinearLayoutManager(requireActivity());
         binding.rvRecipes.setLayoutManager(linearLayoutManager);
+
+        randomRecipeAdapter = new RandomRecipeAdapter(null, viewModel);
+        binding.rvRecipes.setAdapter(randomRecipeAdapter);
 
         binding.rvRecipes.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -135,25 +133,23 @@ public class RecipeFragment extends Fragment {
 
         viewModel.randomRecipes.observe(getViewLifecycleOwner(), event -> {
             if (event.getIfNotHandled() == null) return;
-            recipes = new ArrayList<>(event.peek().recipes);
 
-            if (adapter == null) {
-                adapter = new RecipeAdapter(event.peek().recipes, viewModel);
-                binding.rvRecipes.setAdapter(adapter);
+            if (randomRecipeAdapter.getItems() == null) {
+                randomRecipeAdapter.append(event.peek().recipes);
 
             } else if (scrolling) {
                 scrolling = false;
-                adapter.append(event.peek().recipes);
+                randomRecipeAdapter.append(event.peek().recipes);
                 binding.rvRecipes.scrollToPosition(rvPosition);
 
             } else  {
-                adapter.updateRecipes(event.peek().recipes);
+                randomRecipeAdapter.updateRecipes(event.peek().recipes);
             }
         });
 
         viewModel.onRecipeSelected.observe(getViewLifecycleOwner(), event -> {
             if (event.getIfNotHandled() == null) return;
-            listener.onRecipeSelectedEvent(event.peek().intValue(), viewModel.getRecipeIds(recipes));
+            listener.onRecipeSelectedEvent(event.peek().intValue(), viewModel.getRecipeIds(randomRecipeAdapter.getItems()));
         });
     }
 }

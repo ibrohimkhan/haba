@@ -1,6 +1,5 @@
 package com.udacity.haba.ui.recipedetails;
 
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -20,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.squareup.picasso.Picasso;
 import com.udacity.haba.R;
+import com.udacity.haba.data.model.RecipeDetails;
 import com.udacity.haba.databinding.FragmentRecipeDetailsBinding;
 import com.udacity.haba.ui.recipedetails.analyzedinstructions.AnalyzedInstructionsAdapter;
 import com.udacity.haba.ui.recipedetails.extendedingredients.ExtendedIngredientsAdapter;
@@ -27,18 +27,29 @@ import com.udacity.haba.utils.DialogUtils;
 
 public class RecipeDetailsFragment extends Fragment {
 
-    public static final String TAG = "RecipeDetailsFragment";
-    private static final String KEY_SELECTED_RECIPE_ID = "selected_recipe_id";
+    public static final String TAG                      = "RecipeDetailsFragment";
+    private static final String KEY_SELECTED_RECIPE_ID  = "selected_recipe_id";
+    private static final String KEY_SELECTED_RECIPE     = "selected_recipe";
 
     private long selectedId;
-    private RecipeDetailsViewModel viewModel;
+    private RecipeDetails selectedRecipe;
 
+    private RecipeDetailsViewModel viewModel;
     private FragmentRecipeDetailsBinding binding;
-    private boolean liked;
 
     public static RecipeDetailsFragment newInstance(long id) {
         Bundle args = new Bundle();
         args.putLong(KEY_SELECTED_RECIPE_ID, id);
+
+        RecipeDetailsFragment fragment = new RecipeDetailsFragment();
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
+    public static RecipeDetailsFragment newInstance(RecipeDetails details) {
+        Bundle args = new Bundle();
+        args.putSerializable(KEY_SELECTED_RECIPE, details);
 
         RecipeDetailsFragment fragment = new RecipeDetailsFragment();
         fragment.setArguments(args);
@@ -55,6 +66,10 @@ public class RecipeDetailsFragment extends Fragment {
         if (bundle != null && bundle.containsKey(KEY_SELECTED_RECIPE_ID)) {
             selectedId = bundle.getLong(KEY_SELECTED_RECIPE_ID);
             viewModel.initialize(selectedId);
+
+        } else if (bundle != null && bundle.containsKey(KEY_SELECTED_RECIPE)) {
+            selectedRecipe = (RecipeDetails) bundle.getSerializable(KEY_SELECTED_RECIPE);
+            viewModel.recipeDetails.setValue(selectedRecipe);
         }
     }
 
@@ -73,7 +88,6 @@ public class RecipeDetailsFragment extends Fragment {
         });
 
         binding.ctlCollapsingToolbarLayout.setCollapsedTitleTextColor(Color.WHITE);
-        binding.rvExtendedIngredients.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         viewModel.loading.observe(getViewLifecycleOwner(), event -> {
             if (event.getIfNotHandled() == null) return;
@@ -122,6 +136,8 @@ public class RecipeDetailsFragment extends Fragment {
 
             if (recipeDetails.extendedIngredients != null && !recipeDetails.extendedIngredients.isEmpty()) {
                 binding.tvIngredientsTitle.setVisibility(View.VISIBLE);
+                binding.rvExtendedIngredients.setLayoutManager(new LinearLayoutManager(requireContext()));
+
                 ExtendedIngredientsAdapter adapter = new ExtendedIngredientsAdapter(recipeDetails.extendedIngredients);
                 binding.rvExtendedIngredients.setAdapter(adapter);
             }
@@ -145,14 +161,13 @@ public class RecipeDetailsFragment extends Fragment {
             binding.tvSave.setOnClickListener( item -> {
                 if (!binding.tvSave.isEnabled()) return;
 
-                liked = !liked;
-                recipeDetails.isLiked = liked;
+                recipeDetails.isLiked = !recipeDetails.isLiked;
 
-                if (liked) likeRecipe();
+                if (recipeDetails.isLiked) likeRecipe();
                 else dislikeRecipe();
 
                 binding.tvSave.setEnabled(false);
-                if (liked) viewModel.save(recipeDetails);
+                if (recipeDetails.isLiked) viewModel.save(recipeDetails);
                 else viewModel.remove(recipeDetails);
             });
         });
@@ -162,6 +177,11 @@ public class RecipeDetailsFragment extends Fragment {
                 binding.tvSave.setEnabled(true);
                 Toast.makeText(requireContext(), getString(R.string.action_completed), Toast.LENGTH_SHORT).show();
             }
+        });
+
+        viewModel.removed.observe(getViewLifecycleOwner(), event -> {
+            if (event.getIfNotHandled() == null) return;
+            // TODO: REMOVE ITEM
         });
     }
 

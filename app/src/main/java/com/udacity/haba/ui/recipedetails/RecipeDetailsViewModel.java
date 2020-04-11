@@ -33,6 +33,7 @@ public class RecipeDetailsViewModel extends ViewModel {
     MutableLiveData<RecipeDetails> recipeDetails        = new MutableLiveData<>();
 
     MutableLiveData<Event<Boolean>> completed           = new MutableLiveData<>();
+    MutableLiveData<Event<RecipeDetails>> removed       = new MutableLiveData<>();
 
     private long currentId;
 
@@ -74,6 +75,7 @@ public class RecipeDetailsViewModel extends ViewModel {
                         .subscribe(
                                 () -> {
                                     completed.postValue(new Event<>(true));
+                                    removed.postValue(new Event<>(recipeDetails));
                                 },
                                 throwable -> {
                                     Log.d(TAG, throwable.toString());

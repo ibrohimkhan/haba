@@ -1,4 +1,4 @@
-package com.udacity.haba.ui.recipes;
+package com.udacity.haba.ui.favorites;
 
 import android.view.View;
 
@@ -7,9 +7,9 @@ import androidx.annotation.NonNull;
 import com.udacity.haba.ui.base.BaseViewHolder;
 import com.udacity.haba.utils.Event;
 
-public class RecipeViewHolder extends BaseViewHolder<RecipeViewModel> {
+public class FavoriteViewHolder extends BaseViewHolder<FavoriteRecipeViewModel> {
 
-    public RecipeViewHolder(@NonNull View itemView, RecipeViewModel viewModel) {
+    public FavoriteViewHolder(@NonNull View itemView, FavoriteRecipeViewModel viewModel) {
         super(itemView, viewModel);
     }
 

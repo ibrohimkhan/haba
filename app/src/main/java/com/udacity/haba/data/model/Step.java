@@ -1,8 +1,11 @@
 package com.udacity.haba.data.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Step {
+public class Step implements Serializable {
+
+    private static final long serialversionUID = 45L;
 
     public final int number;
     public final String step;

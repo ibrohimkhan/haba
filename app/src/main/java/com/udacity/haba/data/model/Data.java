@@ -1,6 +1,10 @@
 package com.udacity.haba.data.model;
 
-public class Data {
+import java.io.Serializable;
+
+public class Data implements Serializable {
+
+    private static final long serialversionUID = 43L;
 
     public final long id;
     public final String name;

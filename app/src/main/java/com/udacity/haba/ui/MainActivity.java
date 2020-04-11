@@ -9,12 +9,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.udacity.haba.R;
-import com.udacity.haba.data.model.Recipe;
+import com.udacity.haba.data.model.RecipeDetails;
 import com.udacity.haba.databinding.ActivityMainBinding;
 import com.udacity.haba.ui.eventlistener.RecipeSelectionEventListener;
+import com.udacity.haba.ui.favorites.FavoriteDetailsViewPagerFragment;
+import com.udacity.haba.ui.favorites.FavoriteRecipeFragment;
 import com.udacity.haba.ui.recipedetails.RecipeDetailsViewPagerFragment;
 import com.udacity.haba.ui.recipes.RecipeFragment;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements RecipeSelectionEventListener {
@@ -22,7 +25,14 @@ public class MainActivity extends AppCompatActivity implements RecipeSelectionEv
     private ActivityMainBinding binding;
 
     private static final String ACTIVE_FRAGMENT = "active_fragment";
+    private static final String RECIPE_POSITION = "recipe_position";
+    private static final String RECIPE_IDS = "recipe_ids";
+    private static final String RECIPE_DETAILS = "recipe_details";
+
     private Fragment activeFragment;
+    private int recipePosition;
+    private List<Long> recipeIds;
+    private List<RecipeDetails> recipeDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +41,34 @@ public class MainActivity extends AppCompatActivity implements RecipeSelectionEv
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setupBottomNavigationBar();
+        if (savedInstanceState != null) {
+            String tag = savedInstanceState.getString(ACTIVE_FRAGMENT);
+            activeFragment = getSupportFragmentManager().findFragmentByTag(tag);
+
+            if (activeFragment instanceof RecipeFragment)
+                showRecipesFragment();
+
+            else if (activeFragment instanceof FavoriteRecipeFragment)
+                showFavoriteRecipeFragment();
+
+            else if (activeFragment instanceof RecipeDetailsViewPagerFragment) {
+                if (savedInstanceState.containsKey(RECIPE_POSITION)) {
+                    recipePosition = savedInstanceState.getInt(RECIPE_POSITION);
+
+                    if (savedInstanceState.containsKey(RECIPE_IDS))
+                        recipeIds = (List<Long>) savedInstanceState.getSerializable(RECIPE_IDS);
+
+                    if (savedInstanceState.containsKey(RECIPE_DETAILS))
+                        recipeDetails = (List<RecipeDetails>) savedInstanceState.getSerializable(RECIPE_DETAILS);
+
+                    if (recipeDetails == null) showRecipeDetailsFragment(recipePosition, recipeIds);
+                    else showFavoriteRecipeDetailsFragment(recipePosition, recipeDetails);
+                }
+            }
+
+        } else {
+            setupBottomNavigationBar();
+        }
     }
 
     @Override
@@ -54,25 +91,44 @@ public class MainActivity extends AppCompatActivity implements RecipeSelectionEv
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(ACTIVE_FRAGMENT, activeFragment.getTag());
+        outState.putInt(RECIPE_POSITION, recipePosition);
+        outState.putSerializable(RECIPE_IDS, (Serializable) recipeIds);
+        outState.putSerializable(RECIPE_DETAILS, (Serializable) recipeDetails);
     }
 
     @Override
     public void onRecipeSelectedEvent(int position, List<Long> recipeIds) {
+        recipePosition = position;
+        this.recipeIds = recipeIds;
+
+        recipeDetails = null;
         showRecipeDetailsFragment(position, recipeIds);
+    }
+
+    @Override
+    public void onFavoriteRecipeSelectedEvent(int position, List<RecipeDetails> recipeDetails) {
+        recipePosition = position;
+        this.recipeDetails = recipeDetails;
+
+        recipeIds = null;
+        showFavoriteRecipeDetailsFragment(position, recipeDetails);
     }
 
     private void setupBottomNavigationBar() {
         binding.bottomNavigation.setOnNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.recipes:
+                    clearBackstack();
                     showRecipesFragment();
                     return true;
 
                 case R.id.ingredients:
+                    clearBackstack();
                     showIngredientsFragment();
                     return true;
 
                 case R.id.favorites:
+                    clearBackstack();
                     showFavoriteRecipeFragment();
                     return true;
             }
@@ -111,12 +167,36 @@ public class MainActivity extends AppCompatActivity implements RecipeSelectionEv
         }
     }
 
+    private void showFavoriteRecipeDetailsFragment(int position, List<RecipeDetails> recipeDetails) {
+        if (activeFragment instanceof FavoriteDetailsViewPagerFragment) return;
+
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FavoriteDetailsViewPagerFragment.TAG);
+
+        if (fragment == null) {
+            fragment = FavoriteDetailsViewPagerFragment.newInstance(position, recipeDetails);
+            addNewFragment(fragment, FavoriteDetailsViewPagerFragment.TAG);
+
+        } else {
+            showFragment(fragment);
+        }
+    }
+
     private void showIngredientsFragment() {
         Toast.makeText(this, "Ingredients selected", Toast.LENGTH_SHORT).show();
     }
 
     private void showFavoriteRecipeFragment() {
-        Toast.makeText(this, "Favorites selected", Toast.LENGTH_SHORT).show();
+        if (activeFragment instanceof FavoriteRecipeFragment) return;
+
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(FavoriteRecipeFragment.TAG);
+
+        if (fragment == null) {
+            fragment = FavoriteRecipeFragment.newInstance();
+            addNewFragment(fragment, FavoriteRecipeFragment.TAG);
+
+        } else {
+            showFragment(fragment);
+        }
     }
 
     private void addNewFragment(Fragment fragment, String tag) {
@@ -141,5 +221,13 @@ public class MainActivity extends AppCompatActivity implements RecipeSelectionEv
         transaction.commitNow();
 
         activeFragment = fragment;
+    }
+
+    private void clearBackstack() {
+        while (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStackImmediate();
+        }
+
+        activeFragment = null;
     }
 }

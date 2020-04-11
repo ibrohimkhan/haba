@@ -1,8 +1,11 @@
 package com.udacity.haba.data.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class RecipeDetails extends Recipe {
+public class RecipeDetails extends Recipe implements Serializable {
+
+    private static final long serialversionUID = 42L;
 
     public final long id;
     public final String title;
