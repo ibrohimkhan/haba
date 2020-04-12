@@ -14,12 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.udacity.haba.R;
 import com.udacity.haba.data.model.RecipeDetails;
 import com.udacity.haba.databinding.FragmentFavoriteRecipesBinding;
+import com.udacity.haba.ui.eventlistener.RecipeRemoveEventNotifier;
 import com.udacity.haba.ui.eventlistener.RecipeSelectionEventListener;
 import com.udacity.haba.utils.DialogUtils;
 
 import java.util.List;
 
-public class FavoriteRecipeFragment extends Fragment {
+public class FavoriteRecipeFragment extends Fragment implements RecipeRemoveEventNotifier {
 
     public static final String TAG = "FavoriteRecipeFragment";
 
@@ -88,5 +89,10 @@ public class FavoriteRecipeFragment extends Fragment {
             if (event.getIfNotHandled() == null) return;
             listener.onFavoriteRecipeSelectedEvent(event.peek().intValue(), recipes);
         });
+    }
+
+    @Override
+    public void notifyRecipeRemoveEvent(RecipeDetails recipeDetails) {
+        adapter.remove(recipeDetails);
     }
 }

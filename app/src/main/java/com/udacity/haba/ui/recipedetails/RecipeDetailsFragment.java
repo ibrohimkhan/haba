@@ -21,6 +21,7 @@ import com.squareup.picasso.Picasso;
 import com.udacity.haba.R;
 import com.udacity.haba.data.model.RecipeDetails;
 import com.udacity.haba.databinding.FragmentRecipeDetailsBinding;
+import com.udacity.haba.ui.eventlistener.RecipeRemoveEventListener;
 import com.udacity.haba.ui.recipedetails.analyzedinstructions.AnalyzedInstructionsAdapter;
 import com.udacity.haba.ui.recipedetails.extendedingredients.ExtendedIngredientsAdapter;
 import com.udacity.haba.utils.DialogUtils;
@@ -36,6 +37,8 @@ public class RecipeDetailsFragment extends Fragment {
 
     private RecipeDetailsViewModel viewModel;
     private FragmentRecipeDetailsBinding binding;
+
+    private RecipeRemoveEventListener listener;
 
     public static RecipeDetailsFragment newInstance(long id) {
         Bundle args = new Bundle();
@@ -61,6 +64,9 @@ public class RecipeDetailsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = new ViewModelProvider(this).get(RecipeDetailsViewModel.class);
+
+        if (getActivity() != null)
+            listener = (RecipeRemoveEventListener) getActivity();
 
         Bundle bundle = getArguments();
         if (bundle != null && bundle.containsKey(KEY_SELECTED_RECIPE_ID)) {
@@ -181,7 +187,9 @@ public class RecipeDetailsFragment extends Fragment {
 
         viewModel.removed.observe(getViewLifecycleOwner(), event -> {
             if (event.getIfNotHandled() == null) return;
-            // TODO: REMOVE ITEM
+
+            listener.onRecipeRemoveEvent(event.peek());
+            getActivity().onBackPressed();
         });
     }
 

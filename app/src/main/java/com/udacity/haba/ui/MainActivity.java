@@ -11,6 +11,8 @@ import androidx.fragment.app.FragmentTransaction;
 import com.udacity.haba.R;
 import com.udacity.haba.data.model.RecipeDetails;
 import com.udacity.haba.databinding.ActivityMainBinding;
+import com.udacity.haba.ui.eventlistener.RecipeRemoveEventListener;
+import com.udacity.haba.ui.eventlistener.RecipeRemoveEventNotifier;
 import com.udacity.haba.ui.eventlistener.RecipeSelectionEventListener;
 import com.udacity.haba.ui.favorites.FavoriteDetailsViewPagerFragment;
 import com.udacity.haba.ui.favorites.FavoriteRecipeFragment;
@@ -20,7 +22,7 @@ import com.udacity.haba.ui.recipes.RecipeFragment;
 import java.io.Serializable;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements RecipeSelectionEventListener {
+public class MainActivity extends AppCompatActivity implements RecipeSelectionEventListener, RecipeRemoveEventListener {
 
     private ActivityMainBinding binding;
 
@@ -33,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements RecipeSelectionEv
     private int recipePosition;
     private List<Long> recipeIds;
     private List<RecipeDetails> recipeDetails;
+
+    private RecipeRemoveEventNotifier notifier;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +116,11 @@ public class MainActivity extends AppCompatActivity implements RecipeSelectionEv
 
         recipeIds = null;
         showFavoriteRecipeDetailsFragment(position, recipeDetails);
+    }
+
+    @Override
+    public void onRecipeRemoveEvent(RecipeDetails recipeDetails) {
+        notifier.notifyRecipeRemoveEvent(recipeDetails);
     }
 
     private void setupBottomNavigationBar() {
@@ -197,6 +206,8 @@ public class MainActivity extends AppCompatActivity implements RecipeSelectionEv
         } else {
             showFragment(fragment);
         }
+
+        notifier = (RecipeRemoveEventNotifier) fragment;
     }
 
     private void addNewFragment(Fragment fragment, String tag) {

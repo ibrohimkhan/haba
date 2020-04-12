@@ -28,4 +28,9 @@ public class FavoriteAdapter extends BaseAdapter<RecipeDetails, FavoriteRecipeVi
     public int getResLayout() {
         return R.layout.recipe_item_list;
     }
+
+    public void remove(RecipeDetails recipeDetails) {
+        items.remove(recipeDetails);
+        notifyDataSetChanged();
+    }
 }
