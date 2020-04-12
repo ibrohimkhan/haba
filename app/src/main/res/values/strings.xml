@@ -15,4 +15,6 @@
     <string name="steps">Analyzed Instruction</string>
     <string name="equipments">Equipments</string>
     <string name="action_completed">Action completed!</string>
+    <string name="minutes">minutes</string>
+    <string name="servings">servings</string>
 </resources>

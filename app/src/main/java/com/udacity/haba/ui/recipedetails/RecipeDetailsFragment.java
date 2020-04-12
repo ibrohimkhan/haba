@@ -137,8 +137,8 @@ public class RecipeDetailsFragment extends Fragment {
             binding.ctlCollapsingToolbarLayout.setTitle(getString(R.string.back));
 
             binding.tvRecipeTitle.setText(recipeDetails.title);
-            binding.tvReadyInMinutes.setText(recipeDetails.readyInMinutes + " minutes");
-            binding.tvServings.setText(recipeDetails.servings + " servings");
+            binding.tvReadyInMinutes.setText(recipeDetails.readyInMinutes + " " + getString(R.string.minutes));
+            binding.tvServings.setText(recipeDetails.servings + " " + getString(R.string.servings));
 
             if (recipeDetails.extendedIngredients != null && !recipeDetails.extendedIngredients.isEmpty()) {
                 binding.tvIngredientsTitle.setVisibility(View.VISIBLE);
