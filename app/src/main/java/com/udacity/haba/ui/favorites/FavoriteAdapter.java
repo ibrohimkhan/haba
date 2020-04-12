@@ -2,6 +2,7 @@ package com.udacity.haba.ui.favorites;
 
 import android.view.View;
 
+import com.udacity.haba.R;
 import com.udacity.haba.data.model.RecipeDetails;
 import com.udacity.haba.ui.base.BaseAdapter;
 
@@ -21,5 +22,10 @@ public class FavoriteAdapter extends BaseAdapter<RecipeDetails, FavoriteRecipeVi
     @Override
     public void bind(FavoriteViewHolder holder, int position) {
         holder.bind(items.get(position), position);
+    }
+
+    @Override
+    public int getResLayout() {
+        return R.layout.recipe_item_list;
     }
 }

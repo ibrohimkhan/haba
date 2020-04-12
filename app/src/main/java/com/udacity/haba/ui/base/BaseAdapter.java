@@ -4,10 +4,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.udacity.haba.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +17,11 @@ public abstract class BaseAdapter<T, VM, VH extends BaseViewHolder> extends Recy
     protected VM viewModel;
 
     public abstract VH getViewHolder(View view, VM viewModel);
+
     public abstract void bind(VH holder, int position);
+
+    @LayoutRes
+    public abstract int getResLayout();
 
     public BaseAdapter(List<T> items, VM viewModel) {
         this.items = items;
@@ -28,7 +31,7 @@ public abstract class BaseAdapter<T, VM, VH extends BaseViewHolder> extends Recy
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recipe_item_list, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(getResLayout(), parent, false);
         return getViewHolder(view, viewModel);
     }
 

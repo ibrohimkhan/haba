@@ -1,41 +1,34 @@
 package com.udacity.haba.ui.recipedetails.analyzedinstructions.step;
 
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.udacity.haba.R;
 import com.udacity.haba.data.model.Data;
+import com.udacity.haba.ui.recipedetails.Adapter;
 
 import java.util.List;
 
-public class DataAdapter extends RecyclerView.Adapter<DataViewHolder> {
+public class DataAdapter extends Adapter<Data, DataViewHolder> {
 
-    private List<Data> data;
     private String baseUrl;
 
     public DataAdapter(List<Data> data, String baseUrl) {
-        this.data = data;
+        super(data);
         this.baseUrl = baseUrl;
     }
 
-    @NonNull
     @Override
-    public DataViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.data_item_list, parent, false);
+    public int getResLayout() {
+        return R.layout.data_item_list;
+    }
+
+    @Override
+    public DataViewHolder getViewHolder(View view) {
         return new DataViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull DataViewHolder holder, int position) {
-        holder.bind(data.get(position), baseUrl);
-    }
-
-    @Override
-    public int getItemCount() {
-        return data == null ? 0 : data.size();
+    public void bind(DataViewHolder holder, int position) {
+        holder.bind(items.get(position), baseUrl);
     }
 }

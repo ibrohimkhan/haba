@@ -2,6 +2,7 @@ package com.udacity.haba.ui.recipes;
 
 import android.view.View;
 
+import com.udacity.haba.R;
 import com.udacity.haba.data.model.RecipeDetails;
 import com.udacity.haba.ui.base.BaseAdapter;
 
@@ -22,6 +23,11 @@ public class RandomRecipeAdapter extends BaseAdapter<RecipeDetails, RecipeViewMo
     @Override
     public void bind(RecipeViewHolder holder, int position) {
         holder.bind(items.get(position), position);
+    }
+
+    @Override
+    public int getResLayout() {
+        return R.layout.recipe_item_list;
     }
 
     public void updateRecipes(List<RecipeDetails> recipes) {
