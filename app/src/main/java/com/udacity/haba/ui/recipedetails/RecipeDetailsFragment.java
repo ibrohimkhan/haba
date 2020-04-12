@@ -188,7 +188,7 @@ public class RecipeDetailsFragment extends Fragment {
         viewModel.removed.observe(getViewLifecycleOwner(), event -> {
             if (event.getIfNotHandled() == null) return;
 
-            listener.onRecipeRemoveEvent(event.peek());
+            if (listener != null) listener.onRecipeRemoveEvent(event.peek());
             getActivity().onBackPressed();
         });
     }

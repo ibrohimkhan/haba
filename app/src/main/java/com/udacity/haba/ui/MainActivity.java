@@ -120,7 +120,8 @@ public class MainActivity extends AppCompatActivity implements RecipeSelectionEv
 
     @Override
     public void onRecipeRemoveEvent(RecipeDetails recipeDetails) {
-        notifier.notifyRecipeRemoveEvent(recipeDetails);
+        if (notifier != null)
+            notifier.notifyRecipeRemoveEvent(recipeDetails);
     }
 
     private void setupBottomNavigationBar() {
