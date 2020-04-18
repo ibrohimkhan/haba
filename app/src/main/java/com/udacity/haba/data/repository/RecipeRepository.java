@@ -3,10 +3,12 @@ package com.udacity.haba.data.repository;
 import com.udacity.haba.BuildConfig;
 import com.udacity.haba.data.local.AppDatabase;
 import com.udacity.haba.data.local.entity.DataEntity;
+import com.udacity.haba.data.local.entity.IngredientEntity;
 import com.udacity.haba.data.local.entity.InstructionsEntity;
 import com.udacity.haba.data.local.entity.RecipeDetailsEntity;
 import com.udacity.haba.data.local.entity.StepEntity;
 import com.udacity.haba.data.model.Data;
+import com.udacity.haba.data.model.Ingredient;
 import com.udacity.haba.data.model.Instructions;
 import com.udacity.haba.data.model.RandomRecipe;
 import com.udacity.haba.data.model.Recipe;
@@ -89,6 +91,44 @@ public final class RecipeRepository {
                 .select()
                 .subscribeOn(Schedulers.io())
                 .map(RecipeRepository::entityToRecipeDetailsList);
+    }
+
+    public static Completable save(Ingredient ingredient) {
+        return database.ingredientsDao()
+                .insert(new IngredientEntity(ingredient.getName(), ingredient.isSelected()))
+                .subscribeOn(Schedulers.io());
+    }
+
+    public static Completable delete(Ingredient ingredient) {
+        return database.ingredientsDao()
+                .delete(new IngredientEntity(ingredient.getName(), ingredient.isSelected()))
+                .subscribeOn(Schedulers.io());
+    }
+
+    public static Single<List<Ingredient>> selectAllIngredients() {
+        return database.ingredientsDao()
+                .select()
+                .subscribeOn(Schedulers.io())
+                .toObservable()
+                .flatMapIterable(list -> list)
+                .map(item -> new Ingredient(item.getName(), item.isSelected()))
+                .toList();
+    }
+
+    public static Single<List<Ingredient>> findIngredients(String key) {
+        return database.ingredientsDao()
+                .find(key)
+                .subscribeOn(Schedulers.io())
+                .toObservable()
+                .flatMapIterable(list -> list)
+                .map(item -> new Ingredient(item.getName(), item.isSelected()))
+                .toList();
+    }
+
+    public static Completable update(Ingredient ingredient) {
+        return database.ingredientsDao()
+                .update(ingredient.getName(), ingredient.isSelected())
+                .subscribeOn(Schedulers.io());
     }
 
     private static List<RecipeDetails> toRecipeDetailsList(List<RecipeDetailsResponse> responses) {

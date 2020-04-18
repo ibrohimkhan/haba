@@ -16,6 +16,7 @@ import com.udacity.haba.ui.eventlistener.RecipeRemoveEventNotifier;
 import com.udacity.haba.ui.eventlistener.RecipeSelectionEventListener;
 import com.udacity.haba.ui.favorites.FavoriteDetailsViewPagerFragment;
 import com.udacity.haba.ui.favorites.FavoriteRecipeFragment;
+import com.udacity.haba.ui.ingredients.IngredientFragment;
 import com.udacity.haba.ui.recipedetails.RecipeDetailsViewPagerFragment;
 import com.udacity.haba.ui.recipes.RecipeFragment;
 
@@ -192,7 +193,17 @@ public class MainActivity extends AppCompatActivity implements RecipeSelectionEv
     }
 
     private void showIngredientsFragment() {
-        Toast.makeText(this, "Ingredients selected", Toast.LENGTH_SHORT).show();
+        if (activeFragment instanceof IngredientFragment) return;
+
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(IngredientFragment.TAG);
+
+        if (fragment == null) {
+            fragment = IngredientFragment.newInstance();
+            addNewFragment(fragment, IngredientFragment.TAG);
+
+        } else {
+            showFragment(fragment);
+        }
     }
 
     private void showFavoriteRecipeFragment() {

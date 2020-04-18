@@ -1,7 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tb_ingredients"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bar"
+        android:layout_alignParentTop="true">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:fontFamily="@font/stoke"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textSize="23sp" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_ingredients"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_below="@id/tb_ingredients"
+        android:layout_above="@id/ll_controlls"/>
+
+    <LinearLayout
+        android:id="@+id/ll_controlls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@color/bar"
+        android:layout_alignParentBottom="true">
+
+        <com.udacity.haba.ui.custom.IngredientEditText
+            android:id="@+id/et_ingredients"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:maxLines="3"
+            android:hint="@string/ingredient_hint"
+            android:textColorHint="@color/icon_bar"
+            android:textColor="@color/icon_bar"
+            android:textSize="13sp"
+            android:fontFamily="@font/stoke"
+            android:padding="8dp"
+            android:background="@drawable/ingredient_control_border"/>
+
+        <RelativeLayout
+            android:id="@+id/ll_action_controls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:id="@+id/tv_add_action"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:text="@string/add"
+                android:textSize="13sp"
+                android:textColor="@color/icon_bar"
+                android:textAlignment="center"
+                android:fontFamily="@font/stoke"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:background="@drawable/action_button"
+                android:layout_alignParentStart="true"/>
+
+            <TextView
+                android:id="@+id/tv_clear_action"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:text="@string/clear"
+                android:textSize="13sp"
+                android:textColor="@color/icon_bar"
+                android:textAlignment="center"
+                android:fontFamily="@font/stoke"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:background="@drawable/action_button"
+                android:layout_alignParentEnd="true"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

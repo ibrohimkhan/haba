@@ -8,9 +8,10 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
 import com.udacity.haba.HabaApplication;
+import com.udacity.haba.data.local.entity.IngredientEntity;
 import com.udacity.haba.data.local.entity.RecipeDetailsEntity;
 
-@Database(entities = {RecipeDetailsEntity.class}, version = 1, exportSchema = false)
+@Database(entities = {RecipeDetailsEntity.class, IngredientEntity.class}, version = 2, exportSchema = false)
 @TypeConverters({RecipeDetailsTypeConverter.class})
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -25,7 +26,8 @@ public abstract class AppDatabase extends RoomDatabase {
                     HabaApplication.getContext(),
                     AppDatabase.class,
                     DB_NAME
-            ).build();
+            ).fallbackToDestructiveMigration()
+                    .build();
         }
 
         Log.d(TAG, "Getting the database instance");
@@ -33,4 +35,6 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     public abstract RecipeDetailsDao recipeDetailsDao();
+
+    public abstract IngredientsDao ingredientsDao();
 }

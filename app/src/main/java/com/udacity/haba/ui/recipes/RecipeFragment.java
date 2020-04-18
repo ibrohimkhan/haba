@@ -25,6 +25,7 @@ public class RecipeFragment extends Fragment {
     private FragmentRecipeBinding binding;
     private RecipeViewModel viewModel;
     private RandomRecipeAdapter randomRecipeAdapter;
+    private RecipeAdapter recipeAdapter;
     private LinearLayoutManager linearLayoutManager;
 
     private boolean scrolling;
@@ -69,7 +70,7 @@ public class RecipeFragment extends Fragment {
         binding.rvRecipes.setLayoutManager(linearLayoutManager);
 
         randomRecipeAdapter = new RandomRecipeAdapter(null, viewModel);
-        binding.rvRecipes.setAdapter(randomRecipeAdapter);
+        recipeAdapter = new RecipeAdapter(null, viewModel);
 
         binding.rvRecipes.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -134,6 +135,8 @@ public class RecipeFragment extends Fragment {
         viewModel.randomRecipes.observe(getViewLifecycleOwner(), event -> {
             if (event.getIfNotHandled() == null) return;
 
+            binding.rvRecipes.setAdapter(randomRecipeAdapter);
+
             if (randomRecipeAdapter.getItems() == null) {
                 randomRecipeAdapter.append(event.peek().recipes);
 
@@ -147,9 +150,19 @@ public class RecipeFragment extends Fragment {
             }
         });
 
+        viewModel.recipes.observe(getViewLifecycleOwner(), recipes -> {
+            binding.rvRecipes.setAdapter(recipeAdapter);
+            recipeAdapter.update(recipes);
+        });
+
         viewModel.onRecipeSelected.observe(getViewLifecycleOwner(), event -> {
             if (event.getIfNotHandled() == null) return;
             listener.onRecipeSelectedEvent(event.peek().intValue(), viewModel.getRecipeIds(randomRecipeAdapter.getItems()));
+        });
+
+        viewModel.ingredients.observe(getViewLifecycleOwner(), ingredients -> {
+            if (ingredients == null || ingredients.isEmpty()) viewModel.loadRandomRecipe();
+            else viewModel.loadRecipeByIngredients(ingredients);
         });
     }
 }

@@ -1,9 +1,8 @@
 package com.udacity.haba.data.remote;
 
-import com.udacity.haba.BuildConfig;
 import com.udacity.haba.data.remote.response.RandomRecipeResponse;
-import com.udacity.haba.data.remote.response.RecipeResponse;
 import com.udacity.haba.data.remote.response.RecipeDetailsResponse;
+import com.udacity.haba.data.remote.response.RecipeResponse;
 
 import java.util.List;
 
@@ -14,13 +13,13 @@ import retrofit2.http.Query;
 
 public interface NetworkService {
 
-    @GET(BuildConfig.BASE_URL + Endpoints.RANDOM_RECIPES)
+    @GET(Endpoints.RANDOM_RECIPES)
     Single<RandomRecipeResponse> loadRandomRecipes(
             @Query("number") int number,
             @Query("apiKey") String apiKey
     );
 
-    @GET(BuildConfig.BASE_URL + Endpoints.RECIPES_BY_INGREDIENTS)
+    @GET(Endpoints.RECIPES_BY_INGREDIENTS)
     Single<List<RecipeResponse>> loadRecipesByIngredients(
         @Query("ingredients") List<String> ingredients,
         @Query("number") int number,
@@ -28,7 +27,7 @@ public interface NetworkService {
         @Query("apiKey") String apiKey
     );
 
-    @GET(BuildConfig.BASE_URL + Endpoints.RECIPE_INFORMATION)
+    @GET(Endpoints.RECIPE_INFORMATION)
     Single<RecipeDetailsResponse> loadRecipeDetails(
             @Path("recipe_id") long id,
             @Query("apiKey") String apiKey
