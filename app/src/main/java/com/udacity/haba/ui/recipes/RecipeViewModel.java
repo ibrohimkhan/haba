@@ -14,9 +14,7 @@ import com.udacity.haba.utils.Event;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -24,19 +22,20 @@ import retrofit2.HttpException;
 
 public class RecipeViewModel extends ViewModel {
 
-    private static final String TAG         = RecipeViewModel.class.getSimpleName();
-    private static final int MAX_RECIPES    = 25;
+    private static final String TAG                = RecipeViewModel.class.getSimpleName();
+    private static final int MAX_RECIPES           = 25;
+    private static final int MAX_CUSTOM_RECIPES    = 100;
 
     private CompositeDisposable disposable  = new CompositeDisposable();
 
-    MutableLiveData<Event<Boolean>> loading             = new MutableLiveData<>();
-    MutableLiveData<Event<Boolean>> error               = new MutableLiveData<>();
-    MutableLiveData<Event<Boolean>> connectionError     = new MutableLiveData<>();
-    MutableLiveData<Event<String>> errorMessage         = new MutableLiveData<>();
-    MutableLiveData<Event<RandomRecipe>> randomRecipes  = new MutableLiveData<>();
-    MutableLiveData<List<Recipe>> recipes               = new MutableLiveData<>();
-    MutableLiveData<Event<Integer>> onRecipeSelected    = new MutableLiveData<>();
-    MutableLiveData<List<Ingredient>> ingredients       = new MutableLiveData<>();
+    MutableLiveData<Event<Boolean>> loading                    = new MutableLiveData<>();
+    MutableLiveData<Event<Boolean>> error                      = new MutableLiveData<>();
+    MutableLiveData<Event<Boolean>> connectionError            = new MutableLiveData<>();
+    MutableLiveData<Event<String>> errorMessage                = new MutableLiveData<>();
+    MutableLiveData<Event<RandomRecipe>> randomRecipes         = new MutableLiveData<>();
+    MutableLiveData<Event<List<Recipe>>> recipes               = new MutableLiveData<>();
+    MutableLiveData<Event<Integer>> onRecipeSelected           = new MutableLiveData<>();
+    MutableLiveData<Event<List<Ingredient>>> ingredients       = new MutableLiveData<>();
 
     @Override
     protected void onCleared() {
@@ -49,10 +48,13 @@ public class RecipeViewModel extends ViewModel {
     }
 
     public void loadRandomRecipe() {
+        if (loading.getValue().peek()) return;
         loadRecipes();
     }
 
-    public void loadRecipeByIngredients(List<Ingredient> ingredients) {
+    public void loadCustomRecipe(List<Ingredient> ingredients) {
+        if (loading.getValue().peek()) return;
+
         List<String> names = new ArrayList<>();
         for (Ingredient item : ingredients) {
             if (!item.isSelected()) continue;
@@ -71,11 +73,6 @@ public class RecipeViewModel extends ViewModel {
         return ids;
     }
 
-    public void reload() {
-        if (loading.getValue().peek()) return;
-        loadRecipes();
-    }
-
     private void loadIngredients() {
         loading.postValue(new Event<>(true));
 
@@ -84,7 +81,7 @@ public class RecipeViewModel extends ViewModel {
                         .subscribe(
                                 result -> {
                                     loading.postValue(new Event<>(false));
-                                    ingredients.postValue(result);
+                                    ingredients.postValue(new Event<>(result));
                                 },
                                 throwable -> {
                                     loading.postValue(new Event<>(false));
@@ -105,9 +102,15 @@ public class RecipeViewModel extends ViewModel {
     }
 
     private void loadRecipes(List<String> ingredients) {
+        if (ingredients == null || ingredients.isEmpty()) return;
+        String items = ingredients.toString()
+                .substring(1, ingredients.toString().length() - 1)
+                .toLowerCase();
+
         loading.postValue(new Event<>(true));
+
         disposable.add(
-                RecipeRepository.fetchRecipesByIngredients(ingredients, MAX_RECIPES)
+                RecipeRepository.fetchRecipesByIngredients(items, MAX_CUSTOM_RECIPES)
                         .subscribeOn(Schedulers.io())
                         .subscribe(this::notifyUI, this::handleNetworkError)
         );
@@ -175,6 +178,6 @@ public class RecipeViewModel extends ViewModel {
 
     private void notifyUI(List<Recipe> recipes) {
         loading.postValue(new Event<>(false));
-        this.recipes.postValue(recipes);
+        this.recipes.postValue(new Event<>(recipes));
     }
 }

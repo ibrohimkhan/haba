@@ -33,11 +33,18 @@ public class RecipeAdapter extends BaseAdapter<Recipe, RecipeViewModel, RecipeVi
     public void update(List<Recipe> recipes) {
         if (recipes == null || recipes.isEmpty()) return;
 
-        if (items == null) items = new ArrayList<>();
+        if (items == null) {
+            items = new ArrayList<>(recipes);
+            notifyDataSetChanged();
 
-        items.clear();
-        items.addAll(recipes);
+        } else {
+            int size = items.size();
 
-        notifyDataSetChanged();
+            items.clear();
+            notifyItemRangeRemoved(0, size);
+
+            items.addAll(recipes);
+            notifyItemRangeInserted(0, recipes.size());
+        }
     }
 }

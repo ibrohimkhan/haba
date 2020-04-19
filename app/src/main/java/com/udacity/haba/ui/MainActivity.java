@@ -1,7 +1,6 @@
 package com.udacity.haba.ui;
 
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;

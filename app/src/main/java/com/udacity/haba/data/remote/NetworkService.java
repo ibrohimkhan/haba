@@ -21,7 +21,7 @@ public interface NetworkService {
 
     @GET(Endpoints.RECIPES_BY_INGREDIENTS)
     Single<List<RecipeResponse>> loadRecipesByIngredients(
-        @Query("ingredients") List<String> ingredients,
+        @Query("ingredients") String ingredients,
         @Query("number") int number,
         @Query("ranking") int ranking,
         @Query("apiKey") String apiKey

@@ -22,4 +22,6 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="clear">Clear</string>
+    <string name="custom">Custom Recipes</string>
+    <string name="random">Random Recipes</string>
 </resources>

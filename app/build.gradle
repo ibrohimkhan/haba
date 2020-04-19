@@ -22,8 +22,7 @@ android {
             buildConfigField("String", "BASE_URL", "\"https://api.spoonacular.com/\"")
             buildConfigField("String", "INGREDIENTS_IMAGE_URL", "\"https://spoonacular.com/cdn/ingredients_100x100/\"")
             buildConfigField("String", "EQUIPMENT_IMAGE_URL", "\"https://spoonacular.com/cdn/equipment_100x100/\"")
-            //buildConfigField("String", "API_KEY", "\"YOUR_API_KEY\"")
-            buildConfigField("String", "API_KEY", "\"f9ae54ba8ed6416f81c321e6cff9073a\"")
+            buildConfigField("String", "API_KEY", "\"YOUR_API_KEY\"")
         }
         release {
             minifyEnabled true

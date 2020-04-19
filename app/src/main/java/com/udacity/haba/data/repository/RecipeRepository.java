@@ -50,7 +50,7 @@ public final class RecipeRepository {
                 });
     }
 
-    public static Single<List<Recipe>> fetchRecipesByIngredients(List<String> ingredients, int number) {
+    public static Single<List<Recipe>> fetchRecipesByIngredients(String ingredients, int number) {
         return service.loadRecipesByIngredients(ingredients, number, MIN_MISSED_INGREDIENTS, BuildConfig.API_KEY)
                 .subscribeOn(Schedulers.io())
                 .map(items -> {

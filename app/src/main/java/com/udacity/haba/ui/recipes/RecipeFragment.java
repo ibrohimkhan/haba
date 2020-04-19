@@ -2,6 +2,7 @@ package com.udacity.haba.ui.recipes;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -13,20 +14,27 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.udacity.haba.R;
+import com.udacity.haba.data.model.Ingredient;
 import com.udacity.haba.databinding.FragmentRecipeBinding;
 import com.udacity.haba.ui.eventlistener.RecipeSelectionEventListener;
 import com.udacity.haba.utils.DialogUtils;
+
+import java.util.List;
 
 public class RecipeFragment extends Fragment {
 
     public static final String TAG = "RecipeFragment";
     private static final String REFRESH_KEY = "refreshing_key";
+    private static final String RECIPE_MODE_KEY = "recipe_mode_key";
 
     private FragmentRecipeBinding binding;
     private RecipeViewModel viewModel;
     private RandomRecipeAdapter randomRecipeAdapter;
     private RecipeAdapter recipeAdapter;
     private LinearLayoutManager linearLayoutManager;
+
+    private boolean withIngredients = true;
+    private List<Ingredient> ingredients;
 
     private boolean scrolling;
     private int rvPosition;
@@ -55,12 +63,17 @@ public class RecipeFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(REFRESH_KEY, binding.srSwipeToRefresh.isRefreshing());
+        outState.putBoolean(RECIPE_MODE_KEY, withIngredients);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentRecipeBinding.inflate(inflater, container, false);
+
+        binding.tbRecipe.inflateMenu(R.menu.settings);
+        binding.tbRecipe.setOnMenuItemClickListener(this::onOptionsItemSelected);
+
         return binding.getRoot();
     }
 
@@ -77,23 +90,40 @@ public class RecipeFragment extends Fragment {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                if (linearLayoutManager.getItemCount() == linearLayoutManager.findLastVisibleItemPosition() + 1) {
+                if (!withIngredients && linearLayoutManager.getItemCount() == linearLayoutManager.findLastVisibleItemPosition() + 1) {
                     scrolling = true;
                     rvPosition = linearLayoutManager.findLastVisibleItemPosition();
-                    viewModel.reload();
+
+                    viewModel.loadRandomRecipe();
                 }
             }
         });
 
         binding.srSwipeToRefresh.setProgressViewEndTarget(false, 0);
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(REFRESH_KEY)) {
-            boolean isRefreshing = savedInstanceState.getBoolean(REFRESH_KEY);
-            binding.srSwipeToRefresh.setRefreshing(isRefreshing);
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(REFRESH_KEY)) {
+                boolean isRefreshing = savedInstanceState.getBoolean(REFRESH_KEY);
+                binding.srSwipeToRefresh.setRefreshing(isRefreshing);
+            }
+
+            if (savedInstanceState.containsKey(RECIPE_MODE_KEY)) {
+                withIngredients = savedInstanceState.getBoolean(RECIPE_MODE_KEY);
+            }
+        }
+
+        if (withIngredients) {
+            binding.tvTitle.setText(getString(R.string.custom));
+            binding.rvRecipes.setAdapter(recipeAdapter);
+
+        } else {
+            binding.tvTitle.setText(getString(R.string.random));
+            binding.rvRecipes.setAdapter(randomRecipeAdapter);
         }
 
         binding.srSwipeToRefresh.setOnRefreshListener(() -> {
-            viewModel.reload();
+            if (!withIngredients) viewModel.loadRandomRecipe();
+            else viewModel.loadCustomRecipe(ingredients);
         });
 
         viewModel.loading.observe(getViewLifecycleOwner(), event -> {
@@ -135,8 +165,6 @@ public class RecipeFragment extends Fragment {
         viewModel.randomRecipes.observe(getViewLifecycleOwner(), event -> {
             if (event.getIfNotHandled() == null) return;
 
-            binding.rvRecipes.setAdapter(randomRecipeAdapter);
-
             if (randomRecipeAdapter.getItems() == null) {
                 randomRecipeAdapter.append(event.peek().recipes);
 
@@ -150,19 +178,66 @@ public class RecipeFragment extends Fragment {
             }
         });
 
-        viewModel.recipes.observe(getViewLifecycleOwner(), recipes -> {
-            binding.rvRecipes.setAdapter(recipeAdapter);
-            recipeAdapter.update(recipes);
+        viewModel.recipes.observe(getViewLifecycleOwner(), event -> {
+            if (event.getIfNotHandled() == null) return;
+
+            if (recipeAdapter.getItems() == null) {
+                recipeAdapter.append(event.peek());
+
+            } else if (scrolling) {
+                scrolling = false;
+                recipeAdapter.append(event.peek());
+                binding.rvRecipes.scrollToPosition(rvPosition);
+
+            } else {
+                recipeAdapter.update(event.peek());
+            }
         });
 
         viewModel.onRecipeSelected.observe(getViewLifecycleOwner(), event -> {
             if (event.getIfNotHandled() == null) return;
-            listener.onRecipeSelectedEvent(event.peek().intValue(), viewModel.getRecipeIds(randomRecipeAdapter.getItems()));
+            listener.onRecipeSelectedEvent(
+                    event.peek().intValue(),
+                    viewModel.getRecipeIds(
+                            withIngredients ? recipeAdapter.getItems() : randomRecipeAdapter.getItems()
+                    )
+            );
         });
 
-        viewModel.ingredients.observe(getViewLifecycleOwner(), ingredients -> {
+        viewModel.ingredients.observe(getViewLifecycleOwner(), event -> {
+            if (event.getIfNotHandled() == null) return;
+
+            ingredients = event.peek();
+
             if (ingredients == null || ingredients.isEmpty()) viewModel.loadRandomRecipe();
-            else viewModel.loadRecipeByIngredients(ingredients);
+            else viewModel.loadCustomRecipe(ingredients);
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.custom:
+                withIngredients = true;
+                binding.tvTitle.setText(getString(R.string.custom));
+
+                binding.rvRecipes.setAdapter(null);
+                binding.rvRecipes.setAdapter(recipeAdapter);
+
+                viewModel.loadCustomRecipe(ingredients);
+                return true;
+
+            case R.id.random:
+                withIngredients = false;
+                binding.tvTitle.setText(getString(R.string.random));
+
+                binding.rvRecipes.setAdapter(null);
+                binding.rvRecipes.setAdapter(randomRecipeAdapter);
+
+                viewModel.loadRandomRecipe();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
