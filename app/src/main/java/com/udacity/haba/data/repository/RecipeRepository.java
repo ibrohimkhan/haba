@@ -99,6 +99,12 @@ public final class RecipeRepository {
                 .subscribeOn(Schedulers.io());
     }
 
+    public static Completable save(IngredientEntity... entities) {
+        return database.ingredientsDao()
+                .insert(entities)
+                .subscribeOn(Schedulers.io());
+    }
+
     public static Completable delete(Ingredient ingredient) {
         return database.ingredientsDao()
                 .delete(new IngredientEntity(ingredient.getName(), ingredient.isSelected()))

@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
 
 public class RecipeDetailsViewModel extends ViewModel {
@@ -91,7 +90,6 @@ public class RecipeDetailsViewModel extends ViewModel {
 
         disposable.add(
                 RecipeRepository.fetchRecipeDetails(id)
-                        .subscribeOn(Schedulers.io())
                         .subscribe(this::notifyUI, this::handleError)
         );
     }

@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.udacity.haba.data.local.entity.IngredientEntity;
 import com.udacity.haba.data.model.Ingredient;
 import com.udacity.haba.data.repository.RecipeRepository;
 
@@ -42,6 +43,17 @@ public class IngredientViewModel extends ViewModel {
     public void save(Ingredient ingredient) {
         disposable.add(
                 RecipeRepository.save(ingredient)
+                        .subscribe(
+                                () -> {
+                                    completed.postValue(true);
+                                }
+                        )
+        );
+    }
+
+    public void save(IngredientEntity... entities) {
+        disposable.add(
+                RecipeRepository.save(entities)
                         .subscribe(
                                 () -> {
                                     completed.postValue(true);

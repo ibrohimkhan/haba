@@ -24,4 +24,7 @@
     <string name="clear">Clear</string>
     <string name="custom">Custom Recipes</string>
     <string name="random">Random Recipes</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="habahaba">Habahaba</string>
 </resources>

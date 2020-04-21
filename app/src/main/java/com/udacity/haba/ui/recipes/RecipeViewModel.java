@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
 
 public class RecipeViewModel extends ViewModel {
@@ -96,7 +95,6 @@ public class RecipeViewModel extends ViewModel {
         loading.postValue(new Event<>(true));
         disposable.add(
                 RecipeRepository.fetchRandomRecipes(MAX_RECIPES)
-                        .subscribeOn(Schedulers.io())
                         .subscribe(this::notifyUI, this::handleNetworkError)
         );
     }
@@ -111,7 +109,6 @@ public class RecipeViewModel extends ViewModel {
 
         disposable.add(
                 RecipeRepository.fetchRecipesByIngredients(items, MAX_CUSTOM_RECIPES)
-                        .subscribeOn(Schedulers.io())
                         .subscribe(this::notifyUI, this::handleNetworkError)
         );
     }

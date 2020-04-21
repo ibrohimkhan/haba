@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements RecipeSelectionEv
 
     @Override
     public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
 
             getSupportFragmentManager().popBackStackImmediate();
 

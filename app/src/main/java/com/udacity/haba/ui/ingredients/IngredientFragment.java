@@ -15,10 +15,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.udacity.haba.data.local.entity.IngredientEntity;
 import com.udacity.haba.data.model.Ingredient;
 import com.udacity.haba.databinding.FragmentIngredientsBinding;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class IngredientFragment extends Fragment {
 
@@ -99,8 +101,21 @@ public class IngredientFragment extends Fragment {
 
             if (TextUtils.isEmpty(ingredient)) return;
 
-            Ingredient item = new Ingredient(ingredient, false);
-            viewModel.save(item);
+            if (ingredient.contains(",")) {
+                String[] items = ingredient.split(",");
+                IngredientEntity[] entities = new IngredientEntity[items.length];
+
+                for (int i = 0; i < items.length; i++) {
+                    String item = items[i].trim().substring(0, 1).toUpperCase() + items[i].substring(1).toLowerCase();
+                    entities[i] = new IngredientEntity(item, false);
+                }
+
+                viewModel.save(entities);
+
+            } else {
+                Ingredient item = new Ingredient(ingredient, false);
+                viewModel.save(item);
+            }
 
             binding.etIngredients.setText("");
             binding.llActionControls.setVisibility(View.GONE);
