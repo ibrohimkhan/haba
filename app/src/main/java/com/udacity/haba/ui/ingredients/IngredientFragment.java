@@ -106,7 +106,7 @@ public class IngredientFragment extends Fragment {
                 IngredientEntity[] entities = new IngredientEntity[items.length];
 
                 for (int i = 0; i < items.length; i++) {
-                    String item = items[i].trim().substring(0, 1).toUpperCase() + items[i].substring(1).toLowerCase();
+                    String item = items[i].trim().substring(0, 1).toUpperCase() + items[i].trim().substring(1).toLowerCase();
                     entities[i] = new IngredientEntity(item, false);
                 }
 
