@@ -120,21 +120,22 @@ public class RecipeViewModel extends ViewModel {
             HttpException exception = (HttpException) throwable;
             String message = null;
 
-            try {
-                message =
-                        exception
-                                .response()
-                                .errorBody()
-                                .string()
-                                .split(",")[2]
-                                .split(":")[1]
-                                .replace("}", "")
-                                .replaceAll("\"", "");
+            if (exception.code() == 401) {
+                message = "You are not authorized!";
 
-            } catch (Exception e) {
-                Log.d(TAG, e.toString());
-                FirebaseCrashlytics.getInstance().recordException(e);
-                FirebaseCrashlytics.getInstance().setCustomKey(TAG, e.getMessage());
+            } else {
+                try {
+                    message =
+                            exception
+                                    .response()
+                                    .errorBody()
+                                    .string();
+
+                } catch (Exception e) {
+                    Log.d(TAG, e.toString());
+                    FirebaseCrashlytics.getInstance().recordException(e);
+                    FirebaseCrashlytics.getInstance().setCustomKey(TAG, e.getMessage());
+                }
             }
 
             if (message == null)
